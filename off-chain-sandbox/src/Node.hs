@@ -48,21 +48,20 @@ import Types
     -- PeerAddr,
     RootInfo (..),
     Tx,
-    getSlot,
+    getSlot, SlotTracker,
   )
 
 {- TODO
 
 -}
 
-startNode :: NodeAddr -> IO Node
-startNode nodeAddr = do
+startNode :: SlotTracker IO -> NodeAddr -> IO Node
+startNode slotTracker nodeAddr = do
   inChan <- newChan
   outChan <- newChan
   nState <- newMVar (NState mempty mempty Nothing mempty)
   nodeTids <- newMVar []
   nodeNetId <- newMVar ""
-  slotTracker <- mkSlotTracker
   let node = Node {..}
   idTid <- idThread node
   nodeTids' <- handleNodeProcess node >>= newMVar . (idTid :)
@@ -130,9 +129,9 @@ announceParentTo n receivers = do
     transmit n $ MyParent receivers parent
 
 selectParent :: Node -> RootInfo -> IO ()
-selectParent node newParent = do
+selectParent node incomingInfo = do
   mParent <- getParent node
-  currentParent <-
+  currentInfo <-
     case mParent of
       Nothing -> do
         currSlot <- getSlot (slotTracker node)
@@ -140,18 +139,18 @@ selectParent node newParent = do
         pure $ RootInfo (nodeAddr node) currSlot (NE.singleton $ nodeAddr node) hashId
       Just p -> pure p
 
-  if rootAddr newParent == nodeAddr node
-    || sameOnTime newParent currentParent
+  if rootAddr incomingInfo == nodeAddr node
+    || sameAnnounce incomingInfo currentInfo
     then do
       dLog DiscardLoop $ show node <> " discarding parent announce loop"
       pure ()
     else do
-      if isBetter currentParent newParent
+      if isBetter currentInfo incomingInfo
         then do
           -- reply back to sender with own root
-          announceParentTo node (S.singleton $ head $ announcers newParent)
+          announceParentTo node (S.singleton $ head $ announcers incomingInfo)
         else do
-          setParent node newParent
+          setParent node incomingInfo
           peers <- getPeers node
           announceParentTo node peers
   where
@@ -170,8 +169,8 @@ debugParent = getParent
 ----------------------------
 -- node utils and helpers --
 ----------------------------
-sameOnTime :: RootInfo -> RootInfo -> Bool
-sameOnTime p1 p2 =
+sameAnnounce :: RootInfo -> RootInfo -> Bool
+sameAnnounce p1 p2 =
   ((==) `on` announceTime) p1 p2
     && ((==) `on` rootAddr) p1 p2
 
@@ -203,7 +202,7 @@ resetParent node = do
   modifyMVar_
     (nState node)
     ( \s -> do
-        dLog BeforeReset $ show (nodeParent s)
+        dLog BeforeReset $ show node <> ": " <> show (nodeParent s)
         pure $ s {nodeParent = Nothing}
     )
 

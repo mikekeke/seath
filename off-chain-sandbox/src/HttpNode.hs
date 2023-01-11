@@ -21,9 +21,9 @@ import Node (
 import Types
 import Web.Scotty qualified as S
 
-startHttpNode :: NodeAddr -> IO ThreadId
-startHttpNode port = forkIO $ do
-  node <- startNode port -- >>= addPeer 8888
+startHttpNode :: SlotTracker IO -> NodeAddr -> IO ThreadId
+startHttpNode slotTracker port = forkIO $ do
+  node <- startNode slotTracker port -- >>= addPeer 8888
   listenNode node outMsgHandler
 
   let tellN = tellNode' node

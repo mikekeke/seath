@@ -4,15 +4,15 @@ import Control.Concurrent (forkIO, modifyMVar_, threadDelay)
 import Crypto.Hash.SHA256 (hash)
 import Data.ByteString.Base16 (encode)
 import Data.Text.Encoding (decodeUtf8Lenient)
-import Types (Node (nodeAddr, slotTracker), SlotTracker (SlotTracker, getSlot))
+import Types (NetId, Node (nodeAddr, slotTracker), SlotTracker (SlotTracker, getSlot))
 
-genNetId :: Node -> IO Text
+genNetId :: Node -> IO NetId
 genNetId node = do
   currSlot <- getSlot (slotTracker node)
   let !nId = decodeUtf8Lenient $ encode $ hash (show (nodeAddr node) <> show currSlot)
   pure nId
 
-eachRound :: IO a -> IO b
+eachRound :: IO () -> IO ()
 eachRound a = forever $ waitSlots roundLen >> a
 
 mkSlotTracker :: IO (SlotTracker IO)
@@ -28,7 +28,7 @@ slotSize :: Int
 slotSize = 1
 
 roundLen :: Int
-roundLen = slots 10
+roundLen = slots 300
 
 -------------------
 --      utils    --

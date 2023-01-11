@@ -31,10 +31,11 @@ dSet :: Set LogType
 dSet =
   fromList
     [ Switch,
-      -- BeforeReset,
+      BeforeReset 
+      --,
       -- Send,
       -- Receive,
-      HashUpdate
+      -- HashUpdate
     ]
 
 dLog :: LogType -> Text -> IO ()

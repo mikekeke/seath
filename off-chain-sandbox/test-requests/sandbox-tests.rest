@@ -22,7 +22,7 @@ content-type: application/json
 GET http://localhost:3001//d-get-parent HTTP/1.1
 
 ###
-GET http://localhost:3002//d-get-parent HTTP/1.1
+GET http://localhost:3001//d-get-parent HTTP/1.1
 
 ###
 GET http://localhost:3003//d-get-parent HTTP/1.1
