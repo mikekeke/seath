@@ -1,0 +1,40 @@
+POST http://localhost:3000/add-tx HTTP/1.1
+content-type: application/json
+
+{}
+
+###
+GET http://localhost:3001//d-get-peers HTTP/1.1
+
+###
+GET http://localhost:3002//d-get-peers HTTP/1.1
+
+###
+GET http://localhost:3003//d-get-peers HTTP/1.1
+
+### CONNECT 3002 <-> 3001
+POST http://localhost:3002/connect HTTP/1.1
+content-type: application/json
+
+3001
+
+###
+GET http://localhost:3001//d-get-parent HTTP/1.1
+
+###
+GET http://localhost:3002//d-get-parent HTTP/1.1
+
+###
+GET http://localhost:3003//d-get-parent HTTP/1.1
+
+###  CONNECT 3003 <-> 3002
+POST http://localhost:3003/connect HTTP/1.1
+content-type: application/json
+
+3002
+
+###  CONNECT 3000 <-> 3002
+POST http://localhost:3000/connect HTTP/1.1
+content-type: application/json
+
+3002

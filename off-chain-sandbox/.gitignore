@@ -1,0 +1,9 @@
+dist-newstyle/
+
+# nix-build results
+result
+result-*
+
+.vscode/
+
+*.db
