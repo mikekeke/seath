@@ -23,7 +23,9 @@
               haskellPackages.implicit-hie
               haskellPackages.pointfree
             ];
-          LANG = "C.UTF-8";
+          LC_CTYPE = C.UTF-8;
+          LC_ALL = C.UTF-8;
+          LANG = C.UTF-8;
         };
       in
       {

@@ -10,7 +10,7 @@ With minimal additions, nodes can get the ability to send payload directly to th
 
 At the moment setup is made to work on a single host machine and the node only knows the ports of peers, parent, and root.
 
-## Possible TODOs
+## Possible TODOs and thoughts
 
 - don't accept any messages but connection requests from clients who are not peers
 - do not react to root announcement immediately by switching root and parent, coz we actually don't need to know parent and root until we wish to propagate transactions to the leader
